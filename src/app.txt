@@ -1,0 +1,63 @@
+import "./App.css";
+import { useEffect, useState } from "react";
+
+function App() {
+  const [list, setList] = useState([]);
+  const [EOF, setEOF] = useState(false);
+
+  function GenerateParagraphs(start, end) {
+    const temp = [];
+    for (let i = start; i < end; i++) {
+      temp.push(`This is para no. ${i + 1}`);
+    }
+
+    return temp;
+  }
+
+  const getMoreList = () => {
+    setTimeout(() => {
+      setList([...list, ...GenerateParagraphs(list.length, list.length + 50)]);
+      setEOF(false);
+    }, 5000);
+  };
+
+  useEffect(() => {
+    if (EOF) {
+      getMoreList();
+    }
+
+    function isBottom(el) {
+      if (window.scrollY + window.innerHeight >= document.body.scrollHeight) {
+        console.log(EOF);
+
+        if (EOF) {
+          console.log("returning");
+          return;
+        }
+
+        console.log("reached bottom");
+        setEOF(true);
+      }
+
+      console.log("scroll");
+    }
+
+    window.addEventListener("scroll", isBottom);
+    return () => window.removeEventListener("scroll", isBottom);
+  }, [EOF]);
+
+  useEffect(() => {
+    setList([...GenerateParagraphs(0, 50)]);
+  }, []);
+
+  return (
+    <div className="App">
+      {list.map((item, index) => {
+        return <p key={index}>{item}</p>;
+      })}
+      {EOF && <p>Loading Content ...</p>}
+    </div>
+  );
+}
+
+export default App;
